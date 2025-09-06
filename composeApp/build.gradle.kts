@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
 }
 
 kotlin {
@@ -30,11 +29,15 @@ kotlin {
     }
     
     jvm()
-    
+
+
     sourceSets {
         androidMain.dependencies {
+            implementation(project(":feature:login"))
+            implementation(project(":feature:home"))
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -45,14 +48,34 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.bottomsheet.navigator)
+            implementation(libs.voyager.tab.navigator)
+            implementation(libs.voyager.transitions)
+            implementation(project(":feature:login"))
+            implementation(project(":feature:home"))
+            implementation(project(":core:di"))
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+        iosMain.dependencies {
+            implementation(project(":feature:login"))
+            implementation(project(":feature:home"))
         }
-        jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutinesSwing)
+        val jvmMain by getting {
+            dependencies {
+                implementation("androidx.collection:collection-ktx:1.4.0")
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(project(":feature:login"))
+                implementation(project(":feature:home"))
+            }
         }
+
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "com.example.samplekmpproject.MainKt"
     }
 }
 
@@ -67,34 +90,11 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-}
 
-dependencies {
-    debugImplementation(compose.uiTooling)
-}
 
-compose.desktop {
-    application {
-        mainClass = "com.example.samplekmpproject.MainKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.example.samplekmpproject"
-            packageVersion = "1.0.0"
-        }
-    }
 }

@@ -1,0 +1,51 @@
+name: Build (KMP)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+      - name: Lint (Android)
+        run: ./gradlew lint --stacktrace
+      - name: Unit tests (JVM)
+        run: ./gradlew test --stacktrace
+      - name: Build (all)
+        run: ./gradlew build --stacktrace
+      - name: Assemble Android Debug
+        run: ./gradlew :composeApp:assembleDebug --stacktrace
+
+  ios:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+      - name: Sync Compose framework
+        run: ./gradlew :composeApp:syncFramework --stacktrace
+      - name: Build iOS App (Simulator)
+        run: |
+          xcodebuild -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            build | xcpretty
+        env:
+          NSUnbufferedIO: "YES"
