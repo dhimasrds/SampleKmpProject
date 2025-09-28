@@ -11,35 +11,28 @@ kotlin {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
-
-    // TARGET JVM YANG DITAMBAHKAN
     jvm()
-
     listOf(
         iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "home"
+            baseName = "featuretemplatebase"
             isStatic = true
         }
     }
-
     sourceSets {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.compose.ui.tooling)
-
         }
         commonMain.dependencies {
             implementation(project(":core:model"))
             implementation(project(":core:network"))
             implementation(project(":core:util"))
             implementation(project(":core:di"))
-            implementation(project(":feature:account"))
-
             implementation(libs.kotlinx.coroutines.core)
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -48,42 +41,15 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-
-            implementation(libs.voyager.navigator)
-            implementation(libs.voyager.bottomsheet.navigator)
-            implementation(libs.voyager.tab.navigator)
-            implementation(libs.voyager.transitions)
-
-            // Koin (for GlobalContext/get in common UI)
-            implementation(libs.koin.core)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-        }
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-            }
         }
     }
 }
 
 android {
-    namespace = "com.example.samplekmpproject.feature.home"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
+    namespace = "com.example.featuretemplatebase"
+    compileSdk = 34
     defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
+        minSdk = 24
     }
 }
+

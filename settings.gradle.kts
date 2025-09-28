@@ -40,5 +40,6 @@ include(
     ":core:util",
     ":feature:login",
     ":feature:home",
-    ":feature:feature-template"
+    ":feature:feature-template-base",
+    ":feature:account"
 )

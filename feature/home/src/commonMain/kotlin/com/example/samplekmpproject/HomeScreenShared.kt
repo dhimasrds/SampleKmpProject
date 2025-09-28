@@ -1,5 +1,6 @@
 package com.example.samplekmpproject
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,61 +22,36 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import com.example.account.AccountScreen
 import com.example.samplekmpproject.presentation.HomeViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
-@Preview
+// Create an expect function for platform-specific carousel
 @Composable
-private fun CarouselSectionCommon() {
-    Column {
-        Text(
-            text = "Highlights",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(16.dp)
-        )
+expect fun CarouselSection()
 
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            val carouselItems = listOf("Banner 1", "Banner 2", "Banner 3")
-            items(carouselItems) { banner ->
-                Card(
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(120.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(banner, style = MaterialTheme.typography.bodyLarge)
-                    }
-                }
-            }
-        }
-    }
-}
 @Preview
 @Composable
-private fun ListSectionCommon(items: List<String>) {
+private fun ListSectionCommon(items: List<String>, onItemClick: (String) -> Unit = {}) {
     Column {
         items.forEach { item ->
             Card(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
+                    .clickable { onItemClick(item) }
             ) {
                 Text(
                     text = item,
@@ -87,11 +63,11 @@ private fun ListSectionCommon(items: List<String>) {
     }
 }
 
-
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenContent(username: String) {
+    val navigator = LocalNavigator.currentOrThrow
     val viewModelOrNull = remember {
         runCatching { object : KoinComponent {}.get<HomeViewModel>() }.getOrNull()
     }
@@ -122,9 +98,21 @@ fun HomeScreenContent(username: String) {
                 contentPadding = padding,
                 modifier = Modifier.fillMaxSize()
             ) {
-                item { CarouselSectionCommon() }
+                item { CarouselSection() } // Use platform-specific carousel
                 item { Spacer(Modifier.height(24.dp)) }
-                item { ListSectionCommon(listOf("Profile", "Settings", "Logout", "Account")) }
+                item {
+                    ListSectionCommon(
+                        items = listOf("Profile", "Settings", "Logout", "Account"),
+                        onItemClick = { item ->
+                            when (item) {
+                                "Account" -> navigator.push(AccountScreen(username))
+                                "Profile" -> { /* Handle profile navigation */ }
+                                "Settings" -> { /* Handle settings navigation */ }
+                                "Logout" -> { /* Handle logout */ }
+                            }
+                        }
+                    )
+                }
             }
         }
 

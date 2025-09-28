@@ -35,6 +35,7 @@ kotlin {
         androidMain.dependencies {
             implementation(project(":feature:login"))
             implementation(project(":feature:home"))
+            implementation(project(":feature:account"))
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
 
@@ -54,11 +55,14 @@ kotlin {
             implementation(libs.voyager.transitions)
             implementation(project(":feature:login"))
             implementation(project(":feature:home"))
+            implementation(project(":feature:account"))
             implementation(project(":core:di"))
         }
         iosMain.dependencies {
             implementation(project(":feature:login"))
             implementation(project(":feature:home"))
+            implementation(project(":feature:account"))
+
         }
         val jvmMain by getting {
             dependencies {
@@ -67,6 +71,8 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.swing)
                 implementation(project(":feature:login"))
                 implementation(project(":feature:home"))
+                implementation(project(":feature:account"))
+
             }
         }
 
